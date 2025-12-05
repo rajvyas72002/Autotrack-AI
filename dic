@@ -1,0 +1,32 @@
+import os
+import shutil
+from glob import glob
+import random
+
+# Paths
+base = r"C:\Users\rajvy\OneDrive\Desktop\Autotrack_ai\number_plate"
+img_train = os.path.join(base, "images", "train")
+lbl_train = os.path.join(base, "labels", "train")
+img_val = os.path.join(base, "images", "val")
+lbl_val = os.path.join(base, "labels", "val")
+
+# Create val dirs
+os.makedirs(img_val, exist_ok=True)
+os.makedirs(lbl_val, exist_ok=True)
+
+# Get images
+images = glob(os.path.join(img_train, "*.jpg")) + glob(os.path.join(img_train, "*.png"))
+val_split = int(0.2 * len(images))
+val_images = random.sample(images, val_split)
+
+# Move files
+for img_path in val_images:
+    name = os.path.basename(img_path)
+    label_name = os.path.splitext(name)[0] + ".txt"
+    label_path = os.path.join(lbl_train, label_name)
+
+    shutil.move(img_path, os.path.join(img_val, name))
+    if os.path.exists(label_path):
+        shutil.move(label_path, os.path.join(lbl_val, label_name))
+
+print("✅ Validation set created.")
